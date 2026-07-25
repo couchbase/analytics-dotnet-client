@@ -45,6 +45,25 @@ public static class LoggingUtils
             return defaultLevel;
         }
 
+        // FIT tooling supplies LOG_LEVEL using its own convention (off|error|warn|info|debug|trace),
+        // whose names don't all match Serilog's LogEventLevel (e.g. "warn" vs "Warning", "info" vs
+        // "Information"). Map those explicitly. Serilog has no "off"; Fatal is the least-verbose level.
+        switch (value.Trim().ToLowerInvariant())
+        {
+            case "off":
+                return LogEventLevel.Fatal;
+            case "error":
+                return LogEventLevel.Error;
+            case "warn":
+                return LogEventLevel.Warning;
+            case "info":
+                return LogEventLevel.Information;
+            case "debug":
+                return LogEventLevel.Debug;
+            case "trace":
+                return LogEventLevel.Verbose;
+        }
+
         if (Enum.TryParse<LogEventLevel>(value, true, out var serilogLevel))
         {
             return serilogLevel;

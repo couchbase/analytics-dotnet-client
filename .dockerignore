@@ -1,0 +1,16 @@
+# The FIT performer image is built from the repository root (COPY . .).
+# Exclude build/restore artifacts so a clean in-container restore is used
+# rather than host-resolved obj/bin (which pin a host-specific runtime patch
+# and trip NETSDK1045 when the container SDK differs).
+**/bin/
+**/obj/
+
+# VCS and IDE noise
+.git/
+.github/
+.vs/
+.idea/
+*.user
+
+# Docs and local scratch
+**/*.md
