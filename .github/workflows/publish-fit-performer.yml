@@ -1,0 +1,59 @@
+name: Publish FIT Performer Image
+
+# On a manual/fit-cli dispatch, name the run after the ref being built. fit-cli's
+# `fit performer build` finds the run it dispatched by matching this title against
+# the ref it passed (see pickDispatchedRun in fit-cli). Empty (falls back to the
+# default title) for push/tag triggers, which fit-cli never inspects.
+run-name: ${{ inputs.ref }}
+
+# Builds the Analytics .NET FIT performer (together with the SDK it is built
+# against) as a Docker image and publishes it to
+# ghcr.io/couchbase/analytics-dotnet-fit-performer.
+#
+# The image is tagged with the SDK version: a push of a release tag like `1.0.0`
+# produces `ghcr.io/couchbase/analytics-dotnet-fit-performer:1.0.0`, and the
+# master branch publishes `:main`. It can also be run manually for an arbitrary
+# branch, tag, commit, or PR ref.
+#
+# See: https://github.com/couchbaselabs/sdk-docker-build-action
+
+on:
+  push:
+    branches:
+      - master   # keeps the :main image in sync with HEAD so the nightly FIT run tests current master
+    tags:
+      - '*'
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: "Git ref to build: branch, tag, full commit hash, or 'refs/pull/<n>/merge'. Leave blank to build the default branch."
+        required: false
+        type: string
+
+jobs:
+  # Job id `publish` + a one-entry matrix makes GitHub name the job
+  # `publish (analytics-dotnet)`. fit-cli's `fit performer build` parses that
+  # `publish (<sdk>)` shape to map the built image back to an SDK (see
+  # summariseBuildJobs/parseMatrixJobSdk in fit-cli); mirrors couchbase-jvm-clients'
+  # build-fit-performer.yml. Do not add an explicit `name:` — it would override the
+  # auto-generated `publish (<sdk>)` title fit-cli depends on.
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        sdk: [analytics-dotnet]
+    steps:
+      - name: Build and publish performer image
+        uses: couchbaselabs/sdk-docker-build-action@v1
+        with:
+          sdk: ${{ matrix.sdk }}
+          # Blank on a tag push (the action then uses the pushed tag as the
+          # version); supplied explicitly for manual runs.
+          ref: ${{ inputs.ref }}
+          dockerfile: fit/Couchbase.Analytics.Performer/Dockerfile
+        env:
+          DOCKER_BUILD_SUMMARY: false

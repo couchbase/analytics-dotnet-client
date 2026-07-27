@@ -1,0 +1,37 @@
+name: Run FIT-CLI (Analytics)
+
+on:
+  schedule:
+    # Each day at midnight (UTC)
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+    inputs:
+      preset:
+        description: FIT presets or preset groups to run, comma-separated. (`fit preset list`)
+        required: false
+        type: string
+        default: enterprise-analytics-func-lite
+      collect_extra_diagnostics:
+        description: Collect additional diagnostics (includes cbcollect, is slower)
+        required: false
+        type: boolean
+        default: true
+      channel:
+        description: fit-cli install channel ("latest" or "ci").
+        required: false
+        type: string
+        default: ci
+
+permissions:
+  id-token: write   # required for GitHub OIDC
+  contents: read
+  checks: write
+
+jobs:
+  fit:
+    uses: couchbaselabs/fit-cli/.github/workflows/fit-cli.yaml@main
+    with:
+      preset: ${{ vars.FIT_CLI_PRESET || inputs.preset || 'enterprise-analytics-func-lite' }}
+      collect_extra_diagnostics: ${{ inputs.collect_extra_diagnostics == '' && true || inputs.collect_extra_diagnostics }}
+      performer: 'analytics-dotnet-fit-performer:main'
+      channel: ${{ vars.FIT_CLI_CHANNEL || inputs.channel }}
