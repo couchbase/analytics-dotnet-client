@@ -2,15 +2,15 @@
 _layout: landing
 ---
 
-# Couchbase Analytics .NET Client
+# Couchbase OperationalInsights .NET Client
 
-This library provides a lightweight, high-performance .NET client for interacting with the Couchbase Analytics service.
+This library provides a lightweight, high-performance .NET client for interacting with the Couchbase OperationalInsights service.
 
-It is designed for high-throughput analytics workloads and exposes a simple API to:
+It is designed for high-throughput insights workloads and exposes a simple API to:
 
 - Create a cluster connection with credentials and options
 - Configure timeouts, retries, and TLS settings
-- Execute Analytics statements and stream results
+- Execute OperationalInsights statements and stream results
 - Target queries to a specific database and scope
 
 ## Supported platforms
@@ -20,6 +20,6 @@ It is designed for high-throughput analytics workloads and exposes a simple API 
 
 ## Packages
 
-- `Couchbase.Analytics` — the main client library
+- `Couchbase.OperationalInsights` — the main client library
 
 Installation instructions are in Getting Started](getting-started.md).

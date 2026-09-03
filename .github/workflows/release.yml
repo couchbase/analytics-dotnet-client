@@ -99,17 +99,17 @@ jobs:
           yum -y install tar gzip ca-certificates krb5-libs libicu zlib openssl
 
       - name: Restore
-        run: dotnet restore src/Couchbase.Analytics/Couchbase.Analytics.csproj
+        run: dotnet restore src/Couchbase.OperationalInsights/Couchbase.OperationalInsights.csproj
 
       - name: Build (Release)
-        run: dotnet build src/Couchbase.Analytics/Couchbase.Analytics.csproj --configuration Release --no-restore
+        run: dotnet build src/Couchbase.OperationalInsights/Couchbase.OperationalInsights.csproj --configuration Release --no-restore
 
-      - name: Test - Couchbase.Analytics.UnitTests (net8.0)
-        run: dotnet test tests/Couchbase.Analytics.UnitTests/Couchbase.Analytics.UnitTests.csproj --configuration Release --framework net8.0 --logger GitHubActions --logger "trx;LogFileName=unit-tests-net8.0.trx" --results-directory "TestResults"
+      - name: Test - Couchbase.OperationalInsights.UnitTests (net8.0)
+        run: dotnet test tests/Couchbase.OperationalInsights.UnitTests/Couchbase.OperationalInsights.UnitTests.csproj --configuration Release --framework net8.0 --logger GitHubActions --logger "trx;LogFileName=unit-tests-net8.0.trx" --results-directory "TestResults"
 
-      - name: Test - Couchbase.Analytics.UnitTests (net10.0)
+      - name: Test - Couchbase.OperationalInsights.UnitTests (net10.0)
         if: ${{ !cancelled() }}
-        run: dotnet test tests/Couchbase.Analytics.UnitTests/Couchbase.Analytics.UnitTests.csproj --configuration Release --framework net10.0 --logger GitHubActions --logger "trx;LogFileName=unit-tests-net10.0.trx" --results-directory "TestResults"
+        run: dotnet test tests/Couchbase.OperationalInsights.UnitTests/Couchbase.OperationalInsights.UnitTests.csproj --configuration Release --framework net10.0 --logger GitHubActions --logger "trx;LogFileName=unit-tests-net10.0.trx" --results-directory "TestResults"
 
       - name: Upload Test Results
         if: always()
@@ -148,7 +148,7 @@ jobs:
           cache: false
 
       - name: Restore
-        run: dotnet restore src/Couchbase.Analytics/Couchbase.Analytics.csproj
+        run: dotnet restore src/Couchbase.OperationalInsights/Couchbase.OperationalInsights.csproj
 
       - name: Prepare strong-name key (SNK)
         shell: pwsh
@@ -162,14 +162,14 @@ jobs:
       - name: Build andPack (Release, signed)
         shell: pwsh
         run: |
-          dotnet build src/Couchbase.Analytics/Couchbase.Analytics.csproj -c Release --no-restore /p:ContinuousIntegrationBuild=true /p:Version="${{ needs.validate-inputs.outputs.tag }}" /p:IncludeSymbols=true /p:IncludeSource=true /p:SourceLinkCreate=true /p:SignAssembly=true /p:AssemblyOriginatorKeyFile="$env:SIGNKEY_PATH"
-          dotnet pack src/Couchbase.Analytics/Couchbase.Analytics.csproj -c Release /p:ContinuousIntegrationBuild=true /p:Version="${{ needs.validate-inputs.outputs.tag }}" /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:IncludeSource=true /p:SourceLinkCreate=true /p:SignAssembly=true /p:AssemblyOriginatorKeyFile="$env:SIGNKEY_PATH"
+          dotnet build src/Couchbase.OperationalInsights/Couchbase.OperationalInsights.csproj -c Release --no-restore /p:ContinuousIntegrationBuild=true /p:Version="${{ needs.validate-inputs.outputs.tag }}" /p:IncludeSymbols=true /p:IncludeSource=true /p:SourceLinkCreate=true /p:SignAssembly=true /p:AssemblyOriginatorKeyFile="$env:SIGNKEY_PATH"
+          dotnet pack src/Couchbase.OperationalInsights/Couchbase.OperationalInsights.csproj -c Release /p:ContinuousIntegrationBuild=true /p:Version="${{ needs.validate-inputs.outputs.tag }}" /p:IncludeSymbols=true /p:SymbolPackageFormat=snupkg /p:IncludeSource=true /p:SourceLinkCreate=true /p:SignAssembly=true /p:AssemblyOriginatorKeyFile="$env:SIGNKEY_PATH"
 
       - name: Verify package contents (DLL <-> PDB parity)
         shell: pwsh
         run: |
           $ver = "${{ needs.validate-inputs.outputs.tag }}"
-          $packDir = "src/Couchbase.Analytics/bin/Release"
+          $packDir = "src/Couchbase.OperationalInsights/bin/Release"
           $nupkg  = Get-ChildItem -Path $packDir -Filter "*.$ver.nupkg"  | Where-Object { $_.Name -notlike "*.symbols.nupkg" } | Select-Object -First 1
           $snupkg = Get-ChildItem -Path $packDir -Filter "*.$ver.snupkg" | Select-Object -First 1
           if (-not $nupkg)  { Write-Error "No .nupkg matching version $ver found in $packDir"; exit 1 }
@@ -213,8 +213,8 @@ jobs:
         with:
           name: nuget-packages
           path: |
-            src/Couchbase.Analytics/bin/Release/*.nupkg
-            src/Couchbase.Analytics/bin/Release/*.snupkg
+            src/Couchbase.OperationalInsights/bin/Release/*.nupkg
+            src/Couchbase.OperationalInsights/bin/Release/*.snupkg
 
 
   publish:
