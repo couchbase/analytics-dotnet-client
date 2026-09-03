@@ -68,7 +68,7 @@ jobs:
         run: |
           cbdinocluster -v init --auto
 
-      - name: Start Couchbase OperationalInsights cluster
+      - name: Start Couchbase Analytics cluster
         id: start-cluster
         env:
           INPUT_TAG: ${{ github.event.inputs.version_tag }}
@@ -97,11 +97,11 @@ jobs:
           CBDINO_CLUSTER_ID=$(cbdinocluster -v alloc --def="$(cat cluster.resolved.yml)")
 
           # Connection string through the load balancer (used by most tests)
-          CBDINO_CONNSTR=$(cbdinocluster -v connstr --tls --insights "$CBDINO_CLUSTER_ID")
+          CBDINO_CONNSTR=$(cbdinocluster -v connstr --tls --analytics "$CBDINO_CLUSTER_ID")
 
           # Direct-to-node connection string (required for mTLS tests because
           # the nginx passive load balancer terminates TLS at L7, so client
-          # certificates are not forwarded to the insights service).
+          # certificates are not forwarded to the analytics service).
           # Extract the first cluster node IP from cbdinocluster ps --json.
           NODE_IP=$(cbdinocluster ps --json 2>/dev/null \
             | python3 -c "import sys,json; data=json.load(sys.stdin); [print(n['ip_address']) or sys.exit(0) for c in data for n in c.get('nodes',[]) if n.get('is_cluster_node')]" 2>/dev/null \
@@ -158,7 +158,7 @@ jobs:
       - name: Prepare Functional Test settings.json
         run: |
           echo "Writing functional test settings.json with cluster connection string"
-          cat > tests/Couchbase.OperationalInsights.FunctionalTests/settings.json <<EOF
+          cat > tests/Couchbase.Analytics.FunctionalTests/settings.json <<EOF
           {
             "TestSettings": {
               "ConnectionString": "${CBDINO_CONNSTR}",
@@ -173,11 +173,11 @@ jobs:
             }
           }
           EOF
-          echo "settings.json written:" && cat tests/Couchbase.OperationalInsights.FunctionalTests/settings.json
+          echo "settings.json written:" && cat tests/Couchbase.Analytics.FunctionalTests/settings.json
 
-      - name: Wait for insights service to be ready
+      - name: Wait for analytics service to be ready
         run: |
-          echo "Polling insights service until it accepts queries..."
+          echo "Polling analytics service until it accepts queries..."
           for i in $(seq 1 60); do
             HTTP_CODE=$(curl -sS -o /dev/null -w "%{http_code}" -k \
               -u "${CBDINO_USER}:${CBDINO_PASS}" \
@@ -185,14 +185,14 @@ jobs:
               -d '{"statement": "SELECT 1;"}' \
               "${CBDINO_CONNSTR}/api/v1/request" 2>/dev/null || echo "000")
             if [ "$HTTP_CODE" = "200" ]; then
-              echo "OperationalInsights service is ready (attempt $i)"
+              echo "Analytics service is ready (attempt $i)"
               break
             fi
             echo "Attempt $i/60: HTTP $HTTP_CODE — waiting 5s..."
             sleep 5
           done
           if [ "$HTTP_CODE" != "200" ]; then
-            echo "ERROR: OperationalInsights service did not become ready after 5 minutes"
+            echo "ERROR: Analytics service did not become ready after 5 minutes"
             exit 1
           fi
 
@@ -215,7 +215,7 @@ jobs:
 
       - name: Build and Run Functional Tests (net8.0)
         run: |
-          dotnet test tests/Couchbase.OperationalInsights.FunctionalTests/Couchbase.OperationalInsights.FunctionalTests.csproj \
+          dotnet test tests/Couchbase.Analytics.FunctionalTests/Couchbase.Analytics.FunctionalTests.csproj \
             --configuration Release \
             --framework net8.0 \
             --logger GitHubActions \
@@ -225,7 +225,7 @@ jobs:
       - name: Build and Run Functional Tests (net10.0)
         if: ${{ !cancelled() }}
         run: |
-          dotnet test tests/Couchbase.OperationalInsights.FunctionalTests/Couchbase.OperationalInsights.FunctionalTests.csproj \
+          dotnet test tests/Couchbase.Analytics.FunctionalTests/Couchbase.Analytics.FunctionalTests.csproj \
             --configuration Release \
             --framework net10.0 \
             --logger GitHubActions \

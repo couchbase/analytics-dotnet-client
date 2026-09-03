@@ -37,8 +37,8 @@
       "modern"
     ],
     "globalMetadata": {
-      "_appName": "insights-dotnet-client",
-      "_appTitle": "insights-dotnet-client",
+      "_appName": "analytics-dotnet-client",
+      "_appTitle": "analytics-dotnet-client",
       "_enableSearch": true,
       "pdf": true
     }
