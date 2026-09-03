@@ -1,13 +1,13 @@
 # Getting Started
 
-This guide shows how to install the package, connect to a Couchbase cluster, and run OperationalInsights queries.
+This guide shows how to install the package, connect to a Couchbase cluster, and run Analytics queries.
 
 ## Install
 
 Add the package to your project:
 
 ```bash
-dotnet add package Couchbase.OperationalInsightsClient
+dotnet add package Couchbase.AnalyticsClient
 ```
 
 Requires .NET 8.0.
@@ -17,14 +17,14 @@ Requires .NET 8.0.
 Create a `Cluster` with a connection string and `Credential`. The connection string supports `http` or `https`, multiple hosts, and query/timeout/TLS parameters.
 
 ```csharp
-using Couchbase.OperationalInsightsClient;
-using Couchbase.OperationalInsightsClient.HTTP;
-using Couchbase.OperationalInsightsClient.Options;
+using Couchbase.AnalyticsClient;
+using Couchbase.AnalyticsClient.HTTP;
+using Couchbase.AnalyticsClient.Options;
 
 var credential = Credential.Create("username", "password");
 
 var cluster = Cluster.Create(
-    connectionString: "https://insights.my-couchbase.example.com:18095?max_retries=5",
+    connectionString: "https://analytics.my-couchbase.example.com:18095?max_retries=5",
     credential: credential,
     configureOptions: options => options
         .WithTimeoutOptions(timeoutOpts => timeoutOpts
@@ -42,7 +42,7 @@ To authenticate with a JSON Web Token (JWT) instead of username and password:
 var credential = JwtCredential.Create("xxxxx.yyyyy.zzzzz");
 
 var cluster = Cluster.Create(
-    connectionString: "https://insights.my-couchbase.example.com:18095",
+    connectionString: "https://analytics.my-couchbase.example.com:18095",
     credential: credential
 );
 ```
@@ -59,7 +59,7 @@ var credential = CertificateCredential.FromPkcs12("/path/to/client.pfx", "passwo
 var credential = CertificateCredential.FromPem("/path/to/cert.pem", "/path/to/key.pem");
 
 var cluster = Cluster.Create(
-    connectionString: "https://insights.my-couchbase.example.com:18095",
+    connectionString: "https://analytics.my-couchbase.example.com:18095",
     credential: credential
 );
 ```
@@ -91,13 +91,13 @@ cluster.UpdateCredential(CertificateCredential.FromPkcs12("/path/to/new-client.p
 
 ### Query
 
-Run an OperationalInsights statement and stream rows:
+Run an Analytics statement and stream rows:
 
 > [!NOTE]
 > Results are streamed by default. Use `QueryOptions.WithAsStreaming(false)` to get a blocking result.
 
 ```csharp
-using Couchbase.OperationalInsightsClient.Options;
+using Couchbase.AnalyticsClient.Options;
 
 var result = await cluster.ExecuteQueryAsync(
     "SELECT 1 AS one;",
@@ -117,7 +117,7 @@ await foreach (var row in result.ConfigureAwait(false))
 ```csharp
 var statement = "SELECT * FROM `travel-sample`.inventory.airline WHERE country = $country LIMIT $limit";
 
-var paramResult = await _insights2Fixture.Cluster.ExecuteQueryAsync(
+var paramResult = await _analytics2Fixture.Cluster.ExecuteQueryAsync(
     statement,
     new QueryOptions()
         .WithNamedParameter("country", "United States")

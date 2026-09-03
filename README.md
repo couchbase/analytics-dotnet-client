@@ -2,22 +2,22 @@
   <img src="assets/couchbase-filled.png" alt="Couchbase" width="80" />
 </p>
 
-<h2 align="center">Couchbase OperationalInsights .NET SDK</h2>
+<h2 align="center">Couchbase Analytics .NET SDK</h2>
 
-The official .NET SDK for Couchbase OperationalInsights.
+The official .NET SDK for Couchbase Analytics.
 
 ## Install
 
 Requires .NET 8.0.
 
 ```bash
-dotnet add package Couchbase.OperationalInsightsClient
+dotnet add package Couchbase.AnalyticsClient
 ```
 
 ## Documentation
 
 - **Getting Started**: see [`docs/getting-started.md`](docs/getting-started.md)
-- **API Reference**: see Official API Reference [here](https://docs.couchbase.com/sdk-api/insights-dotnet-client-1.0.0/)
+- **API Reference**: see Official API Reference [here](https://docs.couchbase.com/sdk-api/analytics-dotnet-client-1.0.0/)
 
 ## Quick start
 
@@ -26,14 +26,14 @@ dotnet add package Couchbase.OperationalInsightsClient
 Create a `Cluster` with a connection string and `Credential`. The connection string supports `http` or `https`, multiple hosts, and query/timeout/TLS parameters.
 
 ```csharp
-using Couchbase.OperationalInsightsClient;
-using Couchbase.OperationalInsightsClient.HTTP;
-using Couchbase.OperationalInsightsClient.Options;
+using Couchbase.AnalyticsClient;
+using Couchbase.AnalyticsClient.HTTP;
+using Couchbase.AnalyticsClient.Options;
 
 var credential = Credential.Create("username", "password");
 
 var cluster = Cluster.Create(
-    connectionString: "https://insights.my-couchbase.example.com:18095?max_retries=5",
+    connectionString: "https://analytics.my-couchbase.example.com:18095?max_retries=5",
     credential: credential,
     configureOptions: options => options
         .WithTimeoutOptions(timeoutOpts => timeoutOpts
@@ -47,7 +47,7 @@ Or authenticate with a JWT:
 
 ```csharp
 var cluster = Cluster.Create(
-    connectionString: "https://insights.my-couchbase.example.com:18095",
+    connectionString: "https://analytics.my-couchbase.example.com:18095",
     credential: JwtCredential.Create("xxxxx.yyyyy.zzzzz")
 );
 ```
@@ -56,7 +56,7 @@ Or use mutual TLS (mTLS) with a client certificate:
 
 ```csharp
 var cluster = Cluster.Create(
-    connectionString: "https://insights.my-couchbase.example.com:18095",
+    connectionString: "https://analytics.my-couchbase.example.com:18095",
     credential: CertificateCredential.FromPkcs12("/path/to/client.pfx", "password")
     // or: CertificateCredential.FromPem("/path/to/cert.pem", "/path/to/key.pem")
 );
@@ -74,13 +74,13 @@ var cluster = Cluster.Create(
 
 ### Query
 
-Run an OperationalInsights statement and stream rows:
+Run an Analytics statement and stream rows:
 
 > [!NOTE]
 > Results are streamed by default. Use `QueryOptions.WithAsStreaming(false)` to get a blocking result.
 
 ```csharp
-using Couchbase.OperationalInsightsClient.Options;
+using Couchbase.AnalyticsClient.Options;
 
 var result = await cluster.ExecuteQueryAsync(
     "SELECT i from ARRAY_RANGE(1, 100) AS i;",
@@ -100,7 +100,7 @@ await foreach (var row in result.ConfigureAwait(false))
 ```csharp
 var statement = "SELECT * FROM `travel-sample`.inventory.airline WHERE country = $country LIMIT $limit";
 
-var paramResult = await _insights2Fixture.Cluster.ExecuteQueryAsync(
+var paramResult = await _analytics2Fixture.Cluster.ExecuteQueryAsync(
     statement,
     new QueryOptions()
         .WithNamedParameter("country", "United States")
