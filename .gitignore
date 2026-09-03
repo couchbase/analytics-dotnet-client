@@ -354,7 +354,7 @@ __pycache__/
 # OpenCover UI analysis results
 OpenCover/
 
-# Azure Stream Analytics local run output
+# Azure Stream OperationalInsights local run output
 ASALocalRun/
 
 # MSBuild Binary and Structured Log
@@ -406,7 +406,7 @@ FodyWeavers.xsd
 *.sln.iml
 
 # test config
-tests/Couchbase.Analytics.FunctionalTests/settings.json
+tests/Couchbase.OperationalInsights.FunctionalTests/settings.json
 
 #generated api docs
 docs/_site/

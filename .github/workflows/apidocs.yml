@@ -50,7 +50,7 @@ jobs:
     needs: validate-inputs
     env:
       PACKAGE_VERSION: ${{ needs.validate-inputs.outputs.version }}
-      API_NAME: analytics-dotnet-client
+      API_NAME: insights-dotnet-client
       AWS_REGION: us-west-1
       S3_BUCKET: docs.couchbase.com
     steps:

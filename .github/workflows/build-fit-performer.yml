@@ -31,7 +31,7 @@ jobs:
           cache: false
 
       - name: Restore
-        run: dotnet restore fit/Couchbase.Analytics.Performer/Couchbase.Analytics.Performer.csproj
+        run: dotnet restore fit/Couchbase.OperationalInsights.Performer/Couchbase.OperationalInsights.Performer.csproj
 
       - name: Build (Release)
-        run: dotnet build fit/Couchbase.Analytics.Performer/Couchbase.Analytics.Performer.csproj --configuration Release --no-restore
+        run: dotnet build fit/Couchbase.OperationalInsights.Performer/Couchbase.OperationalInsights.Performer.csproj --configuration Release --no-restore

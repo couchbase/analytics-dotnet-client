@@ -30,13 +30,13 @@ jobs:
           cache: false
 
       - name: Restore
-        run: dotnet restore Couchbase.Analytics.sln
+        run: dotnet restore Couchbase.OperationalInsights.sln
 
       - name: Build (Release)
-        run: dotnet build Couchbase.Analytics.sln --configuration Release --no-restore
+        run: dotnet build Couchbase.OperationalInsights.sln --configuration Release --no-restore
 
-      - name: Test - Couchbase.Analytics.UnitTests (${{ matrix.framework }})
-        run: dotnet test tests/Couchbase.Analytics.UnitTests/Couchbase.Analytics.UnitTests.csproj --configuration Release --framework ${{ matrix.framework }} --no-build --logger GitHubActions --logger "trx;LogFileName=unit-tests-${{ matrix.framework }}.trx" --results-directory "TestResults"
+      - name: Test - Couchbase.OperationalInsights.UnitTests (${{ matrix.framework }})
+        run: dotnet test tests/Couchbase.OperationalInsights.UnitTests/Couchbase.OperationalInsights.UnitTests.csproj --configuration Release --framework ${{ matrix.framework }} --no-build --logger GitHubActions --logger "trx;LogFileName=unit-tests-${{ matrix.framework }}.trx" --results-directory "TestResults"
 
       - name: Upload Test Results
         if: always()
